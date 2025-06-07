@@ -8,6 +8,7 @@ let users = [];
 const isValid = (username) => {
   //returns boolean
   //write code to check is the username is valid
+  return username !== undefined || username !== null;
 };
 
 const authenticatedUser = (username, password) => {
@@ -44,16 +45,37 @@ regd_users.post("/login", (req, res) => {
       username,
     };
     return res.status(200).send("User successfully logged in.");
+  } else {
+    return res.status(208).json({
+      message: "Invalid login.Please check the username and password.",
+    });
   }
-  return res
-    .status(208)
-    .json({ message: "Invalid login.Please check the username and password." });
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const isbn = parseInt(req.params.isbn);
+  const username = req.session.username;
+  const review = req.query.review || req.body.review;
+  let book = books[isbn];
+  if (!isValid(username)) {
+    return res
+      .status(403)
+      .json({ message: "You must be logged in to write a review." });
+  }
+  if (!book) {
+    return res.status(404).json({ message: "Unable to find book" });
+  }
+  if (!review) {
+    return res.status(400).json({ message: "Review content missing" });
+  }
+
+  book.reviews[username] = review;
+  return res.status(200).json({
+    message: `Review for book ${isbn} has been added/updated`,
+    reviews: book.reviews,
+  });
 });
 
 module.exports.authenticated = regd_users;

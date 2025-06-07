@@ -20,7 +20,7 @@ public_users.get("/isbn/:isbn", function (req, res) {
   //Write your code here
   const isbn = req.params.isbn;
 
-  return res.status(300).json();
+  return res.status(300).json(books[isbn]);
 });
 
 // Get book details based on author

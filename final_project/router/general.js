@@ -51,14 +51,18 @@ public_users.get("/title/:title", function (req, res) {
   if (filtered_titles.length > 0) {
     return res.status(300).json(filtered_titles);
   } else {
-    return res.status(300).json({ message: "Yet to be implemented" });
+    return res
+      .status(300)
+      .json({ message: "No books found for the given title." });
   }
 });
 
 //  Get book review
 public_users.get("/review/:isbn", function (req, res) {
   //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const isbn = req.params.isbn;
+  const review = books[isbn]["reviews"];
+  return res.status(300).json(review);
 });
 
 module.exports.general = public_users;

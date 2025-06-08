@@ -75,33 +75,44 @@ public_users.get("/isbn/:isbn", function (req, res) {
 public_users.get("/author/:author", function (req, res) {
   //Write your code here
   const author = req.params.author;
-  const keys = Object.keys(books);
 
-  const filtered_books = keys
-    .map((key) => books[key])
-    .filter((book) => book.author === author);
-  if (filtered_books.length > 0) {
-    return res.status(300).json(filtered_books);
-  } else {
-    return res
-      .status(300)
-      .json({ message: "No books found for the given author." });
-  }
+  new Promise((resolve, reject) => {
+    const keys = Object.keys(books);
+
+    const filtered_books = keys
+      .map((key) => books[key])
+      .filter((book) => book.author === author);
+    if (filtered_books.length > 0) {
+      resolve(filtered_books);
+    } else {
+      reject("No books found for the given author");
+    }
+  })
+    .then((books) => res.status(200).json(books))
+    .catch((err) => res.status(404).json({ message: err }));
 });
 
 // Get all books based on title
-public_users.get("/title/:title", function (req, res) {
+public_users.get("/title/:title", async function (req, res) {
   const title = req.params.title;
-  const keys = Object.keys(books);
-  const filtered_titles = keys
-    .map((key) => books[key])
-    .filter((book) => book.title === title);
-  if (filtered_titles.length > 0) {
-    return res.status(300).json(filtered_titles);
-  } else {
+
+  try {
+    const keys = Object.keys(books);
+    const filtered_titles = keys
+      .map((key) => books[key])
+      .filter((book) => book.title === title);
+
+    if (filtered_titles.length > 0) {
+      return res.status(200).json(filtered_titles);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No books found for the given title." });
+    }
+  } catch (error) {
     return res
-      .status(300)
-      .json({ message: "No books found for the given title." });
+      .status(500)
+      .json({ message: "Error fetching books by title", error: error.message });
   }
 });
 
